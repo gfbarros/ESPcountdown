@@ -44,12 +44,8 @@ FORM_HTML_TEMPLATE = """
     <body>
         <h2>Type in end date (integers only).</h2>
         <form action="/" method="post" enctype="text/plain">
-            <label for "fyear"> Year:</label>
-            <input type="text" id="fyear" name="fyear" value="2025"><br>
-            <label for "fmonth"> Month:</label>
-            <input type="text" id="fmonth" name="Month" value="04"><br>
-            <label for "fday"> Day:</label>
-            <input type="text" id="fday" name="Day" value="30"><br>
+            <label for "fdate"> ISOdate:</label>
+            <input type="text" id="fdate" name="fdate" value="2025-04-30"><br>
             <input type="submit" value="Submit">
         </form>
         {submitted_value}
@@ -66,18 +62,19 @@ def form(request: Request):
     enctype = request.query_params.get("enctype", "text/plain")
 
     if request.method == POST:
-        posted_value = request.form_data.get("fyear")
+        posted_value = request.form_data.get("fdate")
         # Get todays date & convert
-        isodate_string = requests.get(ISODATE_URL)
-        todaydate = datetime.fromisoformat(isodate_string)
-        # targetdate = datetime(2025, 4, 30)
-        # diffdate = targetdate - todaydate
-        # print(diffdate)
+        isodate_string = requests.get(TIME_URL)
+        todaydate = datetime.fromisoformat(isodate_string.text)
+        #targetdate = datetime(2025, 4, 30)
+        targetdate = datetime.fromisoformat(posted_value)
+        interval = targetdate - todaydate
+        print(interval.days)
 
         # update display
         # posted_value = "0000"
         display.fill(0)
-        display.print(posted_value)
+        display.print(interval.days)
 
     return Response(
         request,
